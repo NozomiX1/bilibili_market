@@ -1,5 +1,4 @@
 import json
-import random
 from tqdm import tqdm
 from broswer import *
 from utils import *
@@ -26,61 +25,66 @@ class MarketSpider:
         with open("cookies.txt", "r") as f:
             cookie_pool = [line.strip() for line in f]
         pbar = tqdm(total=self.maxCount, unit="组", desc="爬取进度")
-        while count < self.maxCount and cookie_pool:
-            # human_like_delay()
-            cookie_chosen = cookie_pool[count % len(cookie_pool)]
 
-            headers = {
-                "accept": "application/json, text/plain, */*",
-                "accept-encoding": "gzip, deflate, br, zstd",
-                "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7",
-                "content-length": "171",
-                "content-type": "application/json",
-                "cookie": cookie_chosen,
-                "origin": "https://mall.bilibili.com",
-                "priority": "u=1, i",
-                "referer": "https://mall.bilibili.com/neul-next/index.html?page=magic-market_index",
-                "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Google Chrome\";v=\"134\"",
-                "user-agent": UserAgent().random
-            }
+        while count < self.maxCount:
+            if cookie_pool:
+                # human_like_delay()
+                cookie_chosen = cookie_pool[count % len(cookie_pool)]
 
-            data = {"categoryFilter": "2312", "priceFilters": ["20000-0"], "sortType": "PRICE_ASC",
-                    "discountFilters": ["50-70", "30-50"], "nextId": self.nextId}
+                headers = {
+                    "accept": "application/json, text/plain, */*",
+                    "accept-encoding": "gzip, deflate, br, zstd",
+                    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7",
+                    "content-length": "171",
+                    "content-type": "application/json",
+                    "cookie": cookie_chosen,
+                    "origin": "https://mall.bilibili.com",
+                    "priority": "u=1, i",
+                    "referer": "https://mall.bilibili.com/neul-next/index.html?page=magic-market_index",
+                    "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Google Chrome\";v=\"134\"",
+                    "user-agent": UserAgent().random
+                }
 
-            response = requests.post(self.url, headers=headers, json=data)
-            count += 1
-            if response.status_code == 200:
-                try:
-                    response_json = response.json()
-                    self.nextId = response_json['data']['nextId']
+                data = {"categoryFilter": "2312", "priceFilters": ["20000-0"], "sortType": "PRICE_ASC",
+                        "discountFilters": ["50-70", "30-50"], "nextId": self.nextId}
 
-                    # 可以爬取并存储为jsonl
-                    # with open(self.data_path, 'a', encoding='utf-8') as f:
-                    #     f.write(json.dumps(response_json, ensure_ascii=False) + '\n')
-                    item_list = response_json['data']['data']
-                    for item in item_list:
-                        if self.item_name in item['c2cItemsName']:
-                            print(f'ID: {item["c2cItemsId"]}', f'Price:{item["price"]}')
-                            self.nextId = None
-                    pbar.update(1)
-                    time.sleep(random.uniform(0.5, 1.5))
-                except Exception as e:
-                    print(response)
+                response = requests.post(self.url, headers=headers, json=data)
+                count += 1
+                if response.status_code == 200:
+                    try:
+                        response_json = response.json()
+                        self.nextId = response_json['data']['nextId']
+
+                        # 可以爬取并存储为jsonl
+                        # with open(self.data_path, 'a', encoding='utf-8') as f:
+                        #     f.write(json.dumps(response_json, ensure_ascii=False) + '\n')
+                        item_list = response_json['data']['data']
+                        for item in item_list:
+                            if self.item_name in item['c2cItemsName']:
+                                print(f'ID: {item["c2cItemsId"]}', f'Price:{item["price"]}')
+                                self.nextId = None
+                        pbar.update(1)
+                        time.sleep(random.uniform(0.5, 1.5))
+                    except Exception as e:
+                        print(response)
+                        print(response.text)
+                        print(e)
+
+                else:
+                    cookie_pool.remove(cookie_chosen)
+                    print(f"请求失败，状态码: {response.status_code}，移除当前cookie，剩余{len(cookie_pool)}个cookie")
                     print(response.text)
-                    print(e)
 
             else:
-                cookie_pool.remove(cookie_chosen)
-                print(f"请求失败，状态码: {response.status_code}，移除当前cookie，剩余{len(cookie_pool)}个cookie")
-                print(response.text)
+                print("cookie已经失效，重新获取cookie")
+                cookies = ''
+                for _ in range(self.users_num):
+                    cookie = get_login_cookies(url="https://www.bilibili.com", login_selector=".header-login-entry")
+                    cookie_pool.append(cookie)
+                    cookies += cookie + '\n'
+                with open("cookies.txt", "w") as f:
+                    f.write(cookies)
 
-        if not cookie_pool:
-            print("cookie已经失效，重新获取cookie")
-            cookies = ''
-            for _ in range(self.users_num):
-                cookies += get_login_cookies(url="https://www.bilibili.com", login_selector=".header-login-entry") + '\n'
-            with open("cookies.txt", "w") as f:
-                f.write(cookies)
 
 
 if __name__ == '__main__':

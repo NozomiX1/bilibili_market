@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import time
-from random import random
+import random
 import requests
 from fake_useragent import UserAgent
 
