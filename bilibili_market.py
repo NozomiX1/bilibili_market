@@ -13,11 +13,12 @@ def human_like_delay():
         time.sleep(random.uniform(2, 3))
 
 class MarketSpider:
-    def __init__(self, start_next_id=None, max_count=10000, users_num=1, data_path='./bilibili_market.jsonl'):
+    def __init__(self, item_name, start_next_id=None, max_count=10000, users_num=1, data_path='./bilibili_market.jsonl'):
         self.nextId = start_next_id
         self.maxCount = max_count
         self.data_path = data_path
         self.users_num =users_num
+        self.item_name = item_name
         self.url = 'https://mall.bilibili.com/mall-magic-c/internet/c2c/v2/list'
 
     def crawl(self):
@@ -58,7 +59,7 @@ class MarketSpider:
                     #     f.write(json.dumps(response_json, ensure_ascii=False) + '\n')
                     item_list = response_json['data']['data']
                     for item in item_list:
-                        if '灰色的丑小鸭' in item['c2cItemsName']:
+                        if self.item_name in item['c2cItemsName']:
                             print(f'ID: {item["c2cItemsId"]}', f'Price:{item["price"]}')
                             self.nextId = None
                     pbar.update(1)
@@ -87,7 +88,8 @@ if __name__ == '__main__':
     start_next_id = None  # 可以设置为None或上次爬取的最后一个nextId
     max_count = 400  # 设置最大爬取数量
     users_num = 1 # 设置爬取账号数量
-    spider = MarketSpider(start_next_id=start_next_id, max_count=max_count, data_path='./bilibili_market.jsonl')
+    item_name = '灰色的丑小鸭' # 设置要爬取的商品名称，可以是名字的一部分
+    spider = MarketSpider(item_name,start_next_id=start_next_id, max_count=max_count, data_path='./bilibili_market.jsonl')
 
     # 执行爬取
     spider.crawl()
