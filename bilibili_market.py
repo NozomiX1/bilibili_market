@@ -28,7 +28,7 @@ class MarketSpider:
 
         while count < self.maxCount:
             if cookie_pool:
-                # human_like_delay()
+                human_like_delay()
                 cookie_chosen = cookie_pool[count % len(cookie_pool)]
 
                 headers = {
@@ -64,7 +64,7 @@ class MarketSpider:
                                 print(f'ID: {item["c2cItemsId"]}', f'Price:{item["price"]}')
                                 self.nextId = None
                         pbar.update(1)
-                        time.sleep(random.uniform(0.5, 1.5))
+                        # time.sleep(random.uniform(0.5, 1.5))
                     except Exception as e:
                         print(response)
                         print(response.text)
