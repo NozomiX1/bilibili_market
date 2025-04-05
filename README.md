@@ -27,7 +27,7 @@ python bilibili_market.py
 1. 同一个账号不要过于高频的访问（大概1s访问一次），否则很快就会触发风控（412错误）。可以尝试在访问之间加上随机的sleep时间（bilibili_market.py中有human_like_delay()函数）
 2. 如果你有多个账号，可以尝试使用多个账号流水线爬取（bilibili_market.py中有users_num参数），并且流水线足够长的话可以不使用sleep的操作（大概超过4个账号就能实现）。
 3. 多账号爬取的功能我没有过多测试，可能存在bug。
-4. 代码中，爬取的商品按价格升序，还是用了筛选功能
+4. 代码中，爬取的商品按价格升序，还使用了筛选功能
 ```python
 data = {"categoryFilter": "2312", "priceFilters": ["20000-0"], "sortType": "PRICE_ASC",
         "discountFilters": ["50-70", "30-50"], "nextId": self.nextId}
