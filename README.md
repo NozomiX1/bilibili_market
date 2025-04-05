@@ -5,6 +5,7 @@
 1. 安装运行环境
 ```bash
 pip install -r requirements.txt
+playwright install
 ```
 2. 修改bilibili_market.py中的参数
 ```python
