@@ -91,9 +91,9 @@ if __name__ == '__main__':
     # 初始化爬虫
     start_next_id = None  # 可以设置为None或上次爬取的最后一个nextId
     max_count = 400  # 设置最大爬取数量
-    users_num = 1 # 设置爬取账号数量
+    users_num = 2 # 设置爬取账号数量
     item_name = '灰色的丑小鸭' # 设置要爬取的商品名称，可以是名字的一部分
-    spider = MarketSpider(item_name,start_next_id=start_next_id, max_count=max_count, data_path='./bilibili_market.jsonl')
+    spider = MarketSpider(item_name,start_next_id=start_next_id, max_count=max_count, users_num=users_num, data_path='./bilibili_market.jsonl')
 
     # 执行爬取
     spider.crawl()
